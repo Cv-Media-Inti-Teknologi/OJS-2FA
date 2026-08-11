@@ -161,7 +161,7 @@ class Gomit2FAPlugin extends GenericPlugin {
         $request = Application::get()->getRequest();
         $user = $request->getUser();
         
-        if ($user && strpos($template, 'frontend') !== false && !defined('GOMIT2FA_LINK_INJECTED')) {
+        if ($user && $template === 'frontend/components/header.tpl' && !defined('GOMIT2FA_LINK_INJECTED')) {
             define('GOMIT2FA_LINK_INJECTED', true);
             $router = $request->getRouter();
             $settingsUrl = $router->url($request, null, 'gomit2fa', 'settings');
