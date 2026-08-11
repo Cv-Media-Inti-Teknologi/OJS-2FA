@@ -32,7 +32,7 @@ class Gomit2FAHandler extends PKPHandler {
     }
 
     private function _getPlugin(): Gomit2FAPlugin {
-        return PluginRegistry::getPlugin('generic', 'gomit2faplugin');
+        return PluginRegistry::getPlugin('generic', 'gomit2fa');
     }
 
     // ---- Verify page (2FA challenge after login) ----
