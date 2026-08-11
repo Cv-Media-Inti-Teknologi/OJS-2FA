@@ -17,7 +17,7 @@ class Gomit2FAHandler extends Handler {
     }
 
     private function _getPlugin() {
-        return PluginRegistry::getPlugin('generic', 'gomit2faplugin');
+        return PluginRegistry::getPlugin('generic', 'gomit2fa');
     }
 
     // ---- Verify page (2FA challenge after login) ----
