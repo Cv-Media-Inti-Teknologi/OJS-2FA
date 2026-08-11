@@ -7,6 +7,7 @@ TOTP-based two-factor authentication via Google Authenticator for Open Journal S
 | Branch | OJS Version |
 |--------|-------------|
 | `ojs-3.3.0-13` | OJS 3.3.0-13 (stable-3_3_0) |
+| `ojs-3.4.0-10` | OJS 3.4.0-10 (stable-3_4_0), PHP 8.0+ |
 
 ## Features
 

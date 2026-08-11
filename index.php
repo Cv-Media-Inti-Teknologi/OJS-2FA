@@ -1,5 +1,4 @@
-
 <?php
-require_once('Gomit2FAPlugin.inc.php');
-return new Gomit2FAPlugin();
-?>
+
+require_once('Gomit2FAPlugin.php');
+return new \APP\plugins\generic\gomit2fa\Gomit2FAPlugin();

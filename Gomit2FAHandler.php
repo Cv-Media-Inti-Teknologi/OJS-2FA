@@ -1,22 +1,37 @@
 <?php
-import('classes.handler.Handler');
 
-class Gomit2FAHandler extends Handler {
+namespace APP\plugins\generic\gomit2fa;
+
+use PKP\handler\PKPHandler;
+use PKP\security\Role;
+use PKP\security\authorization\PKPSiteAccessPolicy;
+use PKP\plugins\PluginRegistry;
+use PKP\db\DAORegistry;
+use APP\template\TemplateManager;
+
+class Gomit2FAHandler extends PKPHandler {
     public function __construct() {
         parent::__construct();
         $this->addRoleAssignment(
-            array(ROLE_ID_SITE_ADMIN, ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR, ROLE_ID_AUTHOR, ROLE_ID_REVIEWER, ROLE_ID_ASSISTANT, ROLE_ID_READER),
-            array('verify', 'verifySubmit', 'settings', 'generate', 'enable', 'disable')
+            [
+                Role::ROLE_ID_SITE_ADMIN,
+                Role::ROLE_ID_MANAGER,
+                Role::ROLE_ID_SUB_EDITOR,
+                Role::ROLE_ID_AUTHOR,
+                Role::ROLE_ID_REVIEWER,
+                Role::ROLE_ID_ASSISTANT,
+                Role::ROLE_ID_READER,
+            ],
+            ['verify', 'verifySubmit', 'settings', 'generate', 'enable', 'disable']
         );
     }
 
     public function authorize($request, &$args, $roleAssignments) {
-        import('lib.pkp.classes.security.authorization.PKPSiteAccessPolicy');
         $this->addPolicy(new PKPSiteAccessPolicy($request, null, $roleAssignments));
         return parent::authorize($request, $args, $roleAssignments);
     }
 
-    private function _getPlugin() {
+    private function _getPlugin(): Gomit2FAPlugin {
         return PluginRegistry::getPlugin('generic', 'gomit2faplugin');
     }
 
@@ -28,7 +43,6 @@ class Gomit2FAHandler extends Handler {
     }
 
     public function verifySubmit($args, $request) {
-        // CSRF check
         if (!$request->checkCSRF()) {
             $request->redirect(null, 'gomit2fa', 'verify');
             return;
@@ -40,7 +54,6 @@ class Gomit2FAHandler extends Handler {
             return;
         }
 
-        // Rate limit
         if (Gomit2FAPlugin::isOtpRateLimited($user->getId())) {
             $templateMgr = TemplateManager::getManager($request);
             $templateMgr->assign('error', 'Too many attempts. Please wait 15 minutes.');
@@ -54,7 +67,7 @@ class Gomit2FAHandler extends Handler {
         $secret = Gomit2FAPlugin::decryptSecret($encryptedSecret);
 
         require_once(dirname(__FILE__) . '/lib/GoogleAuthenticator.php');
-        $ga = new GoogleAuthenticator();
+        $ga = new \GoogleAuthenticator();
 
         // Try OTP first
         if ($ga->verifyCode($secret, $code, 2)) {
@@ -93,7 +106,6 @@ class Gomit2FAHandler extends Handler {
         $templateMgr->assign('is2faEnabled', $is2faEnabled);
         $templateMgr->assign('backupCodesCount', $backupCodesCount);
 
-        // Flash error from enable failure
         $session = $request->getSession();
         $flashError = $session->getSessionVar('gomit2fa_flash_error');
         if ($flashError) {
@@ -111,14 +123,12 @@ class Gomit2FAHandler extends Handler {
         $userSettingsDao = DAORegistry::getDAO('UserSettingsDAO');
 
         require_once(dirname(__FILE__) . '/lib/GoogleAuthenticator.php');
-        $ga = new GoogleAuthenticator();
+        $ga = new \GoogleAuthenticator();
         $secret = $ga->createSecret();
 
-        // Encrypt and store secret (not yet enabled)
         $userSettingsDao->updateSetting($user->getId(), 'gomit2fa_secret', Gomit2FAPlugin::encryptSecret($secret));
         $userSettingsDao->updateSetting($user->getId(), 'gomit2fa_enabled', false);
 
-        // Generate backup codes
         $backupCodes = Gomit2FAPlugin::generateBackupCodes(8);
         $userSettingsDao->updateSetting($user->getId(), 'gomit2fa_backup_codes', json_encode(Gomit2FAPlugin::hashBackupCodes($backupCodes)));
 
@@ -126,10 +136,8 @@ class Gomit2FAHandler extends Handler {
         $title = $context ? $context->getLocalizedName() : 'OJS';
         $title = preg_replace('/[^A-Za-z0-9 ]/', '', $title);
 
-        // Build otpauth URI for client-side QR generation (secret stays local)
         $otpauthUri = 'otpauth://totp/' . rawurlencode($user->getUsername()) . '?secret=' . $secret . '&issuer=' . rawurlencode($title);
 
-        // QR JS URL
         $plugin = $this->_getPlugin();
         $qrJsUrl = $request->getBaseUrl() . '/' . $plugin->getPluginPath() . '/js/qrcode.min.js';
 
@@ -141,10 +149,9 @@ class Gomit2FAHandler extends Handler {
         $templateMgr->display($plugin->getTemplateResource('setup.tpl'));
     }
 
-    // ---- Enable 2FA (confirm OTP after scanning QR) ----
+    // ---- Enable 2FA ----
 
     public function enable($args, $request) {
-        // CSRF check
         if (!$request->checkCSRF()) {
             $request->redirect(null, 'gomit2fa', 'settings');
             return;
@@ -153,7 +160,6 @@ class Gomit2FAHandler extends Handler {
         $user = $request->getUser();
         $userSettingsDao = DAORegistry::getDAO('UserSettingsDAO');
 
-        // Rate limit
         if (Gomit2FAPlugin::isOtpRateLimited($user->getId())) {
             $session = $request->getSession();
             $session->setSessionVar('gomit2fa_flash_error', 'Too many attempts. Please wait 15 minutes.');
@@ -166,7 +172,7 @@ class Gomit2FAHandler extends Handler {
         $secret = Gomit2FAPlugin::decryptSecret($encryptedSecret);
 
         require_once(dirname(__FILE__) . '/lib/GoogleAuthenticator.php');
-        $ga = new GoogleAuthenticator();
+        $ga = new \GoogleAuthenticator();
 
         if ($ga->verifyCode($secret, $code, 2)) {
             Gomit2FAPlugin::clearOtpAttempts($user->getId());
@@ -175,7 +181,6 @@ class Gomit2FAHandler extends Handler {
             $session->setSessionVar('gomit2fa_verified', true);
             $request->redirect(null, 'gomit2fa', 'settings');
         } else {
-            // Failed — redirect to settings with error, DON'T regenerate secret
             Gomit2FAPlugin::recordOtpFailure($user->getId());
             $session = $request->getSession();
             $session->setSessionVar('gomit2fa_flash_error', 'Invalid OTP code. Try again — your QR Code and secret key have not changed.');
@@ -186,7 +191,6 @@ class Gomit2FAHandler extends Handler {
     // ---- Disable 2FA (requires OTP confirmation) ----
 
     public function disable($args, $request) {
-        // CSRF check
         if (!$request->checkCSRF()) {
             $request->redirect(null, 'gomit2fa', 'settings');
             return;
@@ -195,13 +199,12 @@ class Gomit2FAHandler extends Handler {
         $user = $request->getUser();
         $code = trim($request->getUserVar('otp_code'));
 
-        // Must provide valid OTP or backup code to disable
         $userSettingsDao = DAORegistry::getDAO('UserSettingsDAO');
         $encryptedSecret = $userSettingsDao->getSetting($user->getId(), 'gomit2fa_secret');
         $secret = Gomit2FAPlugin::decryptSecret($encryptedSecret);
 
         require_once(dirname(__FILE__) . '/lib/GoogleAuthenticator.php');
-        $ga = new GoogleAuthenticator();
+        $ga = new \GoogleAuthenticator();
 
         $valid = $ga->verifyCode($secret, $code, 2) || Gomit2FAPlugin::verifyAndConsumeBackupCode($user->getId(), $code);
 
