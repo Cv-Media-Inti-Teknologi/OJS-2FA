@@ -161,18 +161,36 @@ class Gomit2FAPlugin extends GenericPlugin {
         $request = Application::get()->getRequest();
         $user = $request->getUser();
         
-        if ($user && $template === 'frontend/components/header.tpl' && !defined('GOMIT2FA_LINK_INJECTED')) {
+        if ($user && ($template === 'frontend/components/header.tpl' || $template === 'common/header.tpl') && !defined('GOMIT2FA_LINK_INJECTED')) {
             define('GOMIT2FA_LINK_INJECTED', true);
             $router = $request->getRouter();
             $settingsUrl = $router->url($request, null, 'gomit2fa', 'settings');
             
             $js = "<script>
                 document.addEventListener('DOMContentLoaded', function() {
-                    var nav = document.querySelector('.pkp_navigation_user');
-                    if (nav) {
+                    // Attempt to inject into frontend menu
+                    var frontNav = document.querySelector('.pkp_navigation_user');
+                    if (frontNav) {
                         var li = document.createElement('li');
                         li.innerHTML = '<a href=\"".$settingsUrl."\">2FA Settings</a>';
-                        nav.appendChild(li);
+                        frontNav.appendChild(li);
+                    }
+                    
+                    // Attempt to inject into backend menu (Dashboard)
+                    var backNav = document.querySelector('.app__headerActions, .pkp_nav_user');
+                    if (backNav) {
+                        var btn = document.createElement('a');
+                        btn.href = '".$settingsUrl."';
+                        btn.style = 'color: white; font-weight: bold; margin-right: 15px; display: inline-block; padding: 5px 10px; background: #e02a2a; border-radius: 3px; text-decoration: none;';
+                        btn.innerText = '🛡️ 2FA Settings';
+                        backNav.insertBefore(btn, backNav.firstChild);
+                    } else {
+                        // Fallback: floating button if menu not found
+                        var floatBtn = document.createElement('a');
+                        floatBtn.href = '".$settingsUrl."';
+                        floatBtn.style = 'position: fixed; bottom: 20px; left: 20px; z-index: 9999; background: #e02a2a; color: white; padding: 10px 15px; border-radius: 5px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); text-decoration: none;';
+                        floatBtn.innerHTML = '🛡️ 2FA Settings';
+                        document.body.appendChild(floatBtn);
                     }
                 });
             </script>";
