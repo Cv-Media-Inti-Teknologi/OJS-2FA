@@ -20,7 +20,7 @@ class Gomit2FAPlugin extends GenericPlugin {
     }
 
     public function getDescription() {
-        return 'Menambahkan Two-Factor Authentication (Google Authenticator) ke OJS.';
+        return 'Adds Two-Factor Authentication (Google Authenticator) to OJS.';
     }
 
     // ---- Encryption helpers (AES-256-CBC, key from config salt) ----
@@ -171,7 +171,7 @@ class Gomit2FAPlugin extends GenericPlugin {
                     var nav = document.querySelector('.pkp_navigation_user');
                     if (nav) {
                         var li = document.createElement('li');
-                        li.innerHTML = '<a href=\"".$settingsUrl."\">Pengaturan 2FA</a>';
+                        li.innerHTML = '<a href=\"".$settingsUrl."\">2FA Settings</a>';
                         nav.appendChild(li);
                     }
                 });

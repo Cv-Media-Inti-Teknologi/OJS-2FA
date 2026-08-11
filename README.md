@@ -1,46 +1,46 @@
 # Gomit2FA — Two-Factor Authentication Plugin for OJS
 
-Plugin keamanan autentikasi dua langkah (TOTP) via Google Authenticator untuk Open Journal Systems.
+TOTP-based two-factor authentication via Google Authenticator for Open Journal Systems.
 
-## Kompatibilitas
+## Compatibility
 
 | Branch | OJS Version |
 |--------|-------------|
 | `ojs-3.3.0-13` | OJS 3.3.0-13 (stable-3_3_0) |
 
-## Fitur
+## Features
 
-- **Google Authenticator / Authy / Microsoft Authenticator** — TOTP standar (RFC 6238)
-- **CSRF protection** di semua form
-- **Rate limiting** — 5 percobaan OTP / 15 menit
-- **Backup codes** — 8 kode satu kali pakai, di-hash dengan `password_hash()`
-- **Enkripsi secret** — AES-256-CBC, key dari config salt OJS
-- **QR Code lokal** — generate di browser (qrcode.js), secret tidak dikirim ke API eksternal
-- **CSPRNG** — `random_int()` untuk secret generation
-- **Timing-safe** — `hash_equals()` untuk verifikasi kode
-- **Disable butuh OTP** — konfirmasi kode sebelum matikan 2FA
+- **Google Authenticator / Authy / Microsoft Authenticator** — standard TOTP (RFC 6238)
+- **CSRF protection** on all forms
+- **Rate limiting** — 5 OTP attempts per 15 minutes
+- **Backup codes** — 8 one-time-use codes, stored with `password_hash()`
+- **Encrypted secret** — AES-256-CBC, key derived from OJS config salt
+- **Local QR Code** — generated client-side in browser (qrcode.js), secret never sent to external APIs
+- **CSPRNG** — `random_int()` for secret generation
+- **Timing-safe** — `hash_equals()` for code verification
+- **Disable requires OTP** — confirmation code required before deactivating 2FA
 
-## Instalasi
+## Installation
 
 ```bash
-# Clone branch sesuai versi OJS
+# Clone the branch matching your OJS version
 git clone -b ojs-3.3.0-13 https://github.com/Cv-Media-Inti-Teknologi/OJS-2FA.git
 
-# Copy ke OJS
+# Copy to your OJS installation
 cp -r OJS-2FA/ /path/to/ojs/plugins/generic/gomit2fa/
 
-# Aktifkan via Dashboard > Settings > Website > Plugins > Generic Plugins > Gomit 2FA Plugin
+# Enable via Dashboard > Settings > Website > Plugins > Generic Plugins > Gomit 2FA Plugin
 ```
 
-## Penggunaan
+## Usage
 
-1. Login ke OJS
-2. Klik **Pengaturan 2FA** di navigasi user
-3. Klik **Mulai Konfigurasi 2FA**
-4. Scan QR Code dengan Google Authenticator
-5. Simpan backup codes
-6. Masukkan kode 6 digit untuk mengaktifkan
+1. Log in to OJS
+2. Click **2FA Settings** in the user navigation
+3. Click **Start 2FA Setup**
+4. Scan the QR Code with Google Authenticator
+5. Save your backup codes
+6. Enter the 6-digit code to activate
 
-## Lisensi
+## License
 
 GNU GPL v2

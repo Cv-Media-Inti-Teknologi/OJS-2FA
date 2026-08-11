@@ -10,18 +10,18 @@
     {/if}
 
     <ol>
-        <li>Buka aplikasi Google Authenticator, Authy, atau sejenisnya di HP Anda.</li>
-        <li>Scan QR Code berikut ini:</li>
+        <li>Open Google Authenticator, Authy, or a similar app on your phone.</li>
+        <li>Scan the QR Code below:</li>
     </ol>
 
     <div id="qrcode" style="margin: 20px 0; padding: 20px; background: #fff; display: inline-block; border: 1px solid #ddd; min-width: 200px; min-height: 200px;"></div>
 
-    <p>Atau masukkan kunci rahasia ini secara manual: <strong style="background: #eee; padding: 3px 6px; letter-spacing: 2px;">{$secret}</strong></p>
+    <p>Or enter this secret key manually: <strong style="background: #eee; padding: 3px 6px; letter-spacing: 2px;">{$secret}</strong></p>
 
     <hr style="margin: 30px 0;" />
 
     <h3>Backup Codes</h3>
-    <p style="color: #c62828;"><strong>PENTING:</strong> Simpan kode-kode ini di tempat aman. Setiap kode hanya bisa digunakan sekali sebagai pengganti OTP jika Anda kehilangan akses ke aplikasi authenticator.</p>
+    <p style="color: #c62828;"><strong>IMPORTANT:</strong> Save these codes in a safe place. Each code can only be used once as a substitute for the OTP if you lose access to your authenticator app.</p>
     <div style="background: #f5f5f5; padding: 15px; border: 1px solid #ddd; font-family: monospace; font-size: 14px; letter-spacing: 2px; margin-bottom: 20px; display: inline-block;">
         {foreach from=$backupCodes item=code}
             <div style="padding: 3px 0;">{$code}</div>
@@ -30,8 +30,8 @@
 
     <hr style="margin: 30px 0;" />
 
-    <h3>Konfirmasi</h3>
-    <p>Masukkan 6 digit kode dari aplikasi untuk memverifikasi dan mengaktifkan 2FA.</p>
+    <h3>Confirm</h3>
+    <p>Enter the 6-digit code from the app to verify and activate 2FA.</p>
     <form class="cmp_form" method="post" action="{url page="gomit2fa" op="enable"}">
         {csrf}
         <fieldset class="fields">
@@ -39,7 +39,7 @@
                 <input type="text" name="otp_code" placeholder="123456" maxlength="6" required="required" class="field text" inputmode="numeric" pattern="[0-9]{ldelim}6{rdelim}" autocomplete="one-time-code" style="padding: 10px; font-size: 16px; letter-spacing: 2px;">
             </div>
             <div class="buttons" style="margin-top: 15px;">
-                <button class="pkp_button" type="submit" style="background: #4caf50; color: white;">Aktifkan 2FA Sekarang</button>
+                <button class="pkp_button" type="submit" style="background: #4caf50; color: white;">Activate 2FA Now</button>
             </div>
         </fieldset>
     </form>

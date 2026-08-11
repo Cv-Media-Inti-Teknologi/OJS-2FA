@@ -43,7 +43,7 @@ class Gomit2FAHandler extends Handler {
         // Rate limit
         if (Gomit2FAPlugin::isOtpRateLimited($user->getId())) {
             $templateMgr = TemplateManager::getManager($request);
-            $templateMgr->assign('error', 'Terlalu banyak percobaan. Silakan tunggu 15 menit.');
+            $templateMgr->assign('error', 'Too many attempts. Please wait 15 minutes.');
             $templateMgr->display($this->_getPlugin()->getTemplateResource('verify.tpl'));
             return;
         }
@@ -77,7 +77,7 @@ class Gomit2FAHandler extends Handler {
         // Failed
         Gomit2FAPlugin::recordOtpFailure($user->getId());
         $templateMgr = TemplateManager::getManager($request);
-        $templateMgr->assign('error', 'Kode OTP atau backup code salah/kedaluwarsa.');
+        $templateMgr->assign('error', 'Invalid OTP or backup code.');
         $templateMgr->display($this->_getPlugin()->getTemplateResource('verify.tpl'));
     }
 
@@ -156,7 +156,7 @@ class Gomit2FAHandler extends Handler {
         // Rate limit
         if (Gomit2FAPlugin::isOtpRateLimited($user->getId())) {
             $session = $request->getSession();
-            $session->setSessionVar('gomit2fa_flash_error', 'Terlalu banyak percobaan. Tunggu 15 menit.');
+            $session->setSessionVar('gomit2fa_flash_error', 'Too many attempts. Please wait 15 minutes.');
             $request->redirect(null, 'gomit2fa', 'settings');
             return;
         }
@@ -178,7 +178,7 @@ class Gomit2FAHandler extends Handler {
             // Failed — redirect to settings with error, DON'T regenerate secret
             Gomit2FAPlugin::recordOtpFailure($user->getId());
             $session = $request->getSession();
-            $session->setSessionVar('gomit2fa_flash_error', 'Kode OTP salah. Coba lagi — QR Code dan kunci rahasia Anda tidak berubah.');
+            $session->setSessionVar('gomit2fa_flash_error', 'Invalid OTP code. Try again — your QR Code and secret key have not changed.');
             $request->redirect(null, 'gomit2fa', 'generate');
         }
     }
@@ -207,7 +207,7 @@ class Gomit2FAHandler extends Handler {
 
         if (!$valid) {
             $session = $request->getSession();
-            $session->setSessionVar('gomit2fa_flash_error', 'Kode OTP salah. 2FA tidak dimatikan.');
+            $session->setSessionVar('gomit2fa_flash_error', 'Invalid OTP code. 2FA was not disabled.');
             $request->redirect(null, 'gomit2fa', 'settings');
             return;
         }
