@@ -169,24 +169,35 @@ class Gomit2FAPlugin extends GenericPlugin {
             $js = "<script>
                 (function() {
                     function inject2FA() {
-                        // Attempt to inject into frontend menu
-                        var frontNav = document.querySelector('.pkp_navigation_user');
-                        if (frontNav && !frontNav.querySelector('.gomit2fa-link')) {
+                        // Frontend Dropdown Menu
+                        var frontDropdown = document.querySelector('.pkp_navigation_user > li.profile > ul');
+                        if (frontDropdown && !frontDropdown.querySelector('.gomit2fa-link')) {
                             var li = document.createElement('li');
                             li.className = 'gomit2fa-link';
                             li.innerHTML = '<a href=\"".$settingsUrl."\">2FA Settings</a>';
-                            frontNav.appendChild(li);
+                            var logoutItem = frontDropdown.lastElementChild;
+                            if (logoutItem) {
+                                frontDropdown.insertBefore(li, logoutItem);
+                            } else {
+                                frontDropdown.appendChild(li);
+                            }
                         }
                         
-                        // Attempt to inject into backend menu (Dashboard)
-                        var backNav = document.querySelector('.app__headerActions, .pkp_nav_user');
-                        if (backNav && !backNav.querySelector('.gomit2fa-btn')) {
-                            var btn = document.createElement('a');
-                            btn.className = 'gomit2fa-btn';
-                            btn.href = '".$settingsUrl."';
-                            btn.style = 'color: white; font-weight: bold; margin-right: 15px; display: inline-block; padding: 5px 10px; background: #e02a2a; border-radius: 3px; text-decoration: none;';
-                            btn.innerText = '🛡️ 2FA Settings';
-                            backNav.insertBefore(btn, backNav.firstChild);
+                        // Backend Dropdown Menu (Dashboard)
+                        var backDropdowns = document.querySelectorAll('.app__userNav .pkpDropdown__section ul');
+                        if (backDropdowns.length > 0) {
+                            var backDropdown = backDropdowns[backDropdowns.length - 1];
+                            if (!backDropdown.querySelector('.gomit2fa-link')) {
+                                var li = document.createElement('li');
+                                li.className = 'gomit2fa-link';
+                                li.innerHTML = '<a href=\"".$settingsUrl."\" class=\"pkpDropdown__action\">2FA Settings</a>';
+                                var logoutItem = backDropdown.lastElementChild;
+                                if (logoutItem) {
+                                    backDropdown.insertBefore(li, logoutItem);
+                                } else {
+                                    backDropdown.appendChild(li);
+                                }
+                            }
                         }
                     }
                     
