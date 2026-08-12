@@ -61,6 +61,13 @@ Once the plugin is enabled globally, each user must individually set up 2FA for 
 2. Enter a current OTP or Backup Code to confirm your identity.
 3. Click **Disable 2FA**.
 
+### 4. Manual URL Access (Direct Link)
+If your active journal theme hides the profile dropdown or you are unable to locate the "2FA Settings" button, you can access the configuration page directly by modifying your journal's URL.
+
+Simply append `/gomit2fa/settings` to your base journal path. For example:
+- `https://your-domain.com/index.php/your-journal/gomit2fa/settings`
+- Or if using clean URLs: `https://your-domain.com/your-journal/gomit2fa/settings`
+
 ---
 
 ## 🧑‍💻 Technical Notes
