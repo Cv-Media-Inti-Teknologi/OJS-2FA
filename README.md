@@ -70,13 +70,16 @@ Simply append `/gomit2fa/settings` to your base journal path. For example:
 
 ---
 
-## 🧑‍💻 Technical Notes
-- **Dependencies**: Uses `fpdf` for optional PDF generation scripts and standard `openssl` for encryption.
-- **Database**: Creates user settings entries under `gomit2fa_enabled` and `gomit2fa_secret`. No new tables are required.
-- **Caching**: If you encounter issues with the settings link not appearing immediately, please clear the OJS template cache:
-  ```bash
-  rm -rf cache/t_compile/*
-  ```
+## ❓ FAQ & Troubleshooting
+
+**Q: I enabled the plugin, but the "2FA Settings" menu does not appear in my profile dropdown. What should I do?**  
+**A:** This is usually caused by the OJS template caching system. If you encounter issues with the settings link not appearing immediately, please clear the OJS template cache via the Admin Dashboard or by running the following command in your terminal:
+```bash
+rm -rf cache/t_compile/*
+```
+
+**Q: What happens if I lose my phone and cannot generate the 6-digit code?**  
+**A:** You can use one of the one-time **Backup Codes** generated during your initial setup. We strongly recommend saving these codes in a secure, offline location.
 
 <hr/>
 <div align="center">
